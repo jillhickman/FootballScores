@@ -9,4 +9,3 @@
 .DS_Store
 /build
 *.iml
-/app/src/main/res/values/strings.xml
