@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import barqsoft.footballscores.service.myFetchService;
 
@@ -84,6 +85,14 @@ public class MainScreenFragment extends Fragment implements LoaderManager.Loader
 
         int i = 0;
         cursor.moveToFirst();
+        //For the days that do not have matches, show user with simple message for that day.
+        if(cursor.getCount()<= 0){
+            final ListView score_list = (ListView) getView().findViewById(R.id.scores_list);
+            score_list.setVisibility(View.GONE);
+            final TextView no_matches = (TextView) getView().findViewById(R.id.no_matches);
+            no_matches.setVisibility(View.VISIBLE);
+
+        }
         while (!cursor.isAfterLast())
         {
             i++;
