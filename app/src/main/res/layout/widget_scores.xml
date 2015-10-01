@@ -8,17 +8,33 @@
         android:id="@+id/widget"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:background="@color/green13"
         android:padding="4dp">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:id="@+id/widget_home_name"
+            android:textColor="#000000"
+            android:text="Home Team"/>
 
-        <Button
-            android:layout_width="wrap_content"
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
+            android:textColor="#000000"
             android:gravity="center"
             android:id="@+id/widget_score_textview"
             android:text= "4:2"/>
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:textColor="#000000"
+            android:id="@+id/widget_away_name"
+            android:text="Away Team"/>
 
 
 
