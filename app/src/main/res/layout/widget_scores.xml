@@ -2,39 +2,56 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:padding="@dimen/widget_margin">
 
     <LinearLayout
         android:id="@+id/widget"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
         android:orientation="horizontal"
         android:background="@color/green13"
-        android:padding="4dp">
+        android:padding="4dp"
+        android:gravity="center">
+
+        <!--No matches TextView for those days that have no games-->
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:id="@+id/widget_no_matches"
+            android:text="@string/no_matches"
+            android:gravity="center"
+            android:textColor="#000000"
+            android:visibility="gone"
+            />
+
         <TextView
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:id="@+id/widget_home_name"
             android:textColor="#000000"
-            android:text="Home Team"/>
+            android:padding="10dp"
+            tools:text="Home Team"/>
 
         <TextView
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
+            android:layout_gravity="center_vertical"
             android:textColor="#000000"
             android:gravity="center"
             android:id="@+id/widget_score_textview"
-            android:text= "4:2"/>
+            android:textSize="@dimen/Score_widget"
+            tools:text= "4:2"/>
         <TextView
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:textColor="#000000"
             android:id="@+id/widget_away_name"
-            android:text="Away Team"/>
+            android:padding="10dp"
+            tools:text="Away Team"/>
 
 
 

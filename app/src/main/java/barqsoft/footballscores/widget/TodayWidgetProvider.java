@@ -6,6 +6,7 @@ import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.view.View;
 import android.widget.RemoteViews;
 
 import java.text.DateFormat;
@@ -24,33 +25,6 @@ public class TodayWidgetProvider extends AppWidgetProvider {
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
 
-//        final int count = appWidgetIds.length;
-//
-//        for (int i = 0; i < count; i++) {
-//            int widgetId = appWidgetIds[i];
-//            String number = String.format("%03d", (new Random().nextInt(900) + 100));
-//
-//            RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
-//                    R.layout.simple_widget);
-//            remoteViews.setTextViewText(R.id.textView, number);
-//
-//            Intent intent = new Intent(context, SimpleWidgetProvider.class);
-//            intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-//            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds);
-//            PendingIntent pendingIntent = PendingIntent.getBroadcast(context,
-//                    0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-//            remoteViews.setOnClickPendingIntent(R.id.actionButton, pendingIntent);
-//            appWidgetManager.updateAppWidget(widgetId, remoteViews);
-//        }
-// Perform this loop procedure for each Today widget
-//        for (int appWidgetId : appWidgetIds) {
-//            int layoutId = R.layout.widget_scores;
-//            RemoteViews views = new RemoteViews(context.getPackageName(), layoutId);
-//            // Create an Intent to launch MainActivity
-//            Intent launchIntent = new Intent(context, MainActivity.class);
-//            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, launchIntent, 0);
-//            views.setOnClickPendingIntent(R.id.widget, pendingIntent);
-//        }
 
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.widget_scores);
         Intent configIntent = new Intent(context, MainActivity.class);
@@ -59,11 +33,10 @@ public class TodayWidgetProvider extends AppWidgetProvider {
 
         remoteViews.setOnClickPendingIntent(R.id.widget, configPendingIntent);
 
-//        Date d = new Date();
-//        String date = (new SimpleDateFormat("yyyy-MM-dd")).format(d);
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Calendar calendar = Calendar.getInstance();
+        //Getting the date for 1 days ago from today
         calendar.add(Calendar.DATE, -2);
         String myDate = dateFormat.format(calendar.getTime());
 
@@ -72,25 +45,35 @@ public class TodayWidgetProvider extends AppWidgetProvider {
                 DatabaseContract.scores_table.AWAY_COL,
                 DatabaseContract.scores_table.HOME_GOALS_COL,
                 DatabaseContract.scores_table.AWAY_GOALS_COL,
-                DatabaseContract.scores_table.TIME_COL,
+//                DatabaseContract.scores_table.TIME_COL,
         };
-
+        //Get data from cursor
         Cursor data = context.getContentResolver().query(DatabaseContract.scores_table.buildScoreWithDate(),
                 SCORES_COLUMNS,
                 null,
                 new String[]{myDate},
-//              null,
                 DatabaseContract.scores_table.HOME_GOALS_COL + " DESC LIMIT 1");
 
-        int j = data.getCount();
 
+        //If we have data, set the views
         if (data != null && data.moveToFirst()) {
             remoteViews.setTextViewText(R.id.widget_home_name, data.getString(0));
             remoteViews.setTextViewText(R.id.widget_away_name, data.getString(1));
             remoteViews.setTextViewText(R.id.widget_score_textview, Utilies.getScores(data.getInt(2), data.getInt(3)));
+
+            //Set the no matches gone while the views visible
+            remoteViews.setViewVisibility(R.id.widget_home_name, View.VISIBLE);
+            remoteViews.setViewVisibility(R.id.widget_away_name, View.VISIBLE);
+            remoteViews.setViewVisibility(R.id.widget_score_textview, View.VISIBLE);
+            remoteViews.setViewVisibility(R.id.widget_no_matches, View.GONE);
+        }else if(data.getCount() == 0){
+            //Set the views gone while the no matches visible since there is no matches
+            remoteViews.setViewVisibility(R.id.widget_home_name, View.GONE);
+            remoteViews.setViewVisibility(R.id.widget_away_name, View.GONE);
+            remoteViews.setViewVisibility(R.id.widget_score_textview, View.GONE);
+            remoteViews.setViewVisibility(R.id.widget_no_matches, View.VISIBLE);
+
         }
-//        mHolder.away_name.setText(data.getString(scoresAdapter.COL_AWAY));
-//        mHolder.score.setText(Utilies.getScores(data.getInt(scoresAdapter.COL_HOME_GOALS), data.getInt(scoresAdapter.COL_AWAY_GOALS)));
 
         appWidgetManager.updateAppWidget(appWidgetIds, remoteViews);
     }
