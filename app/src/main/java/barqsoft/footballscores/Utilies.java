@@ -1,5 +1,9 @@
 package barqsoft.footballscores;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 /**
  * Created by yehya khaled on 3/3/2015.
  */
@@ -83,5 +87,16 @@ public class Utilies
             case "Stoke City FC" : return R.drawable.stoke_city;
             default: return R.drawable.no_icon;
         }
+    }
+
+    //Get the today date (use to query for last game to update widget)
+    public static String getTodayDate() {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Calendar calendar = Calendar.getInstance();
+        //Getting the date for today, can do -1 or -2 for previous and two days before to test
+        calendar.add(Calendar.DATE, 0);
+        String myDate = dateFormat.format(calendar.getTime());
+
+        return myDate;
     }
 }

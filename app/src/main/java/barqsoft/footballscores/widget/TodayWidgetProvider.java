@@ -9,14 +9,11 @@ import android.database.Cursor;
 import android.view.View;
 import android.widget.RemoteViews;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-
 import barqsoft.footballscores.DatabaseContract;
 import barqsoft.footballscores.MainActivity;
 import barqsoft.footballscores.R;
 import barqsoft.footballscores.Utilies;
+import barqsoft.footballscores.service.myFetchService;
 
 /**
  * Created by jillhickman on 9/29/15.
@@ -24,7 +21,8 @@ import barqsoft.footballscores.Utilies;
 public class TodayWidgetProvider extends AppWidgetProvider {
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-
+        Intent service_start = new Intent(context, myFetchService.class);
+        context.startService(service_start);
 
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.widget_scores);
         Intent configIntent = new Intent(context, MainActivity.class);
@@ -33,12 +31,6 @@ public class TodayWidgetProvider extends AppWidgetProvider {
 
         remoteViews.setOnClickPendingIntent(R.id.widget, configPendingIntent);
 
-
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        Calendar calendar = Calendar.getInstance();
-        //Getting the date for 1 days ago from today
-        calendar.add(Calendar.DATE, -2);
-        String myDate = dateFormat.format(calendar.getTime());
 
         String [] SCORES_COLUMNS = {
                 DatabaseContract.scores_table.HOME_COL,
@@ -51,7 +43,7 @@ public class TodayWidgetProvider extends AppWidgetProvider {
         Cursor data = context.getContentResolver().query(DatabaseContract.scores_table.buildScoreWithDate(),
                 SCORES_COLUMNS,
                 null,
-                new String[]{myDate},
+                new String[]{Utilies.getTodayDate()},
                 DatabaseContract.scores_table.HOME_GOALS_COL + " DESC LIMIT 1");
 
 
