@@ -4,6 +4,7 @@ import android.app.IntentService;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
 
@@ -24,12 +25,15 @@ import java.util.Vector;
 
 import barqsoft.footballscores.DatabaseContract;
 import barqsoft.footballscores.R;
+import barqsoft.footballscores.Utilies;
+import barqsoft.footballscores.widget.TodayWidgetProvider;
 
 /**
  * Created by yehya khaled on 3/2/2015.
  */
 public class myFetchService extends IntentService
 {
+
     public static final String LOG_TAG = "myFetchService";
     public myFetchService()
     {
@@ -130,6 +134,52 @@ public class myFetchService extends IntentService
         {
             Log.e(LOG_TAG,e.getMessage());
         }
+        //
+        String [] SCORES_COLUMNS = {
+                DatabaseContract.scores_table.HOME_COL,
+                DatabaseContract.scores_table.AWAY_COL,
+                DatabaseContract.scores_table.HOME_GOALS_COL,
+                DatabaseContract.scores_table.AWAY_GOALS_COL,
+//                DatabaseContract.scores_table.TIME_COL,
+        };
+        //Get data from cursor for the widget
+        Cursor data = getApplicationContext().getContentResolver().query(DatabaseContract.scores_table.buildScoreWithDate(),
+                SCORES_COLUMNS,
+                null,
+                //Getting data for today only
+                new String[]{Utilies.getTodayDate()},
+                DatabaseContract.scores_table.HOME_GOALS_COL + " DESC LIMIT 1");
+
+        if (data == null || !data.moveToFirst()) {
+            Intent broadcastIntent = new Intent();
+            broadcastIntent.setAction(TodayWidgetProvider.DATABASE_CHANGED);
+            broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
+            broadcastIntent.putExtra(TodayWidgetProvider.NO_DATA,true);
+            sendBroadcast(broadcastIntent);
+//            return;
+        }else{
+            // Extract the data from the Cursor
+            String homeTeam = data.getString(0);
+            String awayTeam = data.getString(1);
+            int homeGoals = data.getInt(2);
+            int awayGoals = data.getInt(3);
+            data.close();
+
+            Intent broadcastIntent = new Intent();
+            broadcastIntent.setAction(TodayWidgetProvider.DATABASE_CHANGED);
+            broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
+            broadcastIntent.putExtra(TodayWidgetProvider.HOME_COL_KEY, homeTeam);
+            broadcastIntent.putExtra(TodayWidgetProvider.AWAY_COL_KEY, awayTeam);
+            broadcastIntent.putExtra(TodayWidgetProvider.HOME_GOALS_KEY, homeGoals);
+            broadcastIntent.putExtra(TodayWidgetProvider.AWAY_GOALS_KEY, awayGoals);
+            sendBroadcast(broadcastIntent);
+        }
+//        if (!data.moveToFirst()) {
+//            data.close();
+//            return;
+//        }
+
+
     }
     private void processJSONdata (String JSONdata,Context mContext, boolean isReal)
     {
