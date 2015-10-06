@@ -1,12 +1,17 @@
 package barqsoft.footballscores.service;
 
 import android.app.IntentService;
+import android.app.PendingIntent;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
+import android.view.View;
+import android.widget.RemoteViews;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,6 +29,7 @@ import java.util.TimeZone;
 import java.util.Vector;
 
 import barqsoft.footballscores.DatabaseContract;
+import barqsoft.footballscores.MainActivity;
 import barqsoft.footballscores.R;
 import barqsoft.footballscores.Utilies;
 import barqsoft.footballscores.widget.TodayWidgetProvider;
@@ -31,18 +37,16 @@ import barqsoft.footballscores.widget.TodayWidgetProvider;
 /**
  * Created by yehya khaled on 3/2/2015.
  */
-public class myFetchService extends IntentService
+public class MyFetchService extends IntentService
 {
 
-    public static final String LOG_TAG = "myFetchService";
-    public myFetchService()
-    {
-        super("myFetchService");
+    public static final String LOG_TAG = "MyFetchService";
+    public MyFetchService() {
+        super("MyFetchService");
     }
 
     @Override
-    protected void onHandleIntent(Intent intent)
-    {
+    protected void onHandleIntent(Intent intent) {
         getData("n2");
         getData("p2");
 
@@ -134,15 +138,14 @@ public class myFetchService extends IntentService
         {
             Log.e(LOG_TAG,e.getMessage());
         }
-        //
+        //These are the columns that we need for the widget
         String [] SCORES_COLUMNS = {
                 DatabaseContract.scores_table.HOME_COL,
                 DatabaseContract.scores_table.AWAY_COL,
                 DatabaseContract.scores_table.HOME_GOALS_COL,
                 DatabaseContract.scores_table.AWAY_GOALS_COL,
-//                DatabaseContract.scores_table.TIME_COL,
         };
-        //Get data from cursor for the widget
+        //Doing the query for the widget from the content provider
         Cursor data = getApplicationContext().getContentResolver().query(DatabaseContract.scores_table.buildScoreWithDate(),
                 SCORES_COLUMNS,
                 null,
@@ -150,36 +153,59 @@ public class myFetchService extends IntentService
                 new String[]{Utilies.getTodayDate()},
                 DatabaseContract.scores_table.HOME_GOALS_COL + " DESC LIMIT 1");
 
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
+        int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this,
+                TodayWidgetProvider.class));
+
         if (data == null || !data.moveToFirst()) {
-            Intent broadcastIntent = new Intent();
-            broadcastIntent.setAction(TodayWidgetProvider.DATABASE_CHANGED);
-            broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-            broadcastIntent.putExtra(TodayWidgetProvider.NO_DATA,true);
-            sendBroadcast(broadcastIntent);
-//            return;
+
+            for (int appWidgetId : appWidgetIds) {
+
+                //If no data, update the widget to say that there are no matches for that day
+                RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.widget_scores);
+                remoteViews.setViewVisibility(R.id.widget_home_name, View.GONE);
+                remoteViews.setViewVisibility(R.id.widget_away_name, View.GONE);
+                remoteViews.setViewVisibility(R.id.widget_score_textview, View.GONE);
+                remoteViews.setViewVisibility(R.id.widget_no_matches, View.VISIBLE);
+
+
+                //Fires the App from the widget
+                Intent configIntent = new Intent(getApplicationContext(), MainActivity.class);
+                PendingIntent configPendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, configIntent, 0);
+                remoteViews.setOnClickPendingIntent(R.id.widget, configPendingIntent);
+
+                appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+            }
+
         }else{
             // Extract the data from the Cursor
-            String homeTeam = data.getString(0);
-            String awayTeam = data.getString(1);
-            int homeGoals = data.getInt(2);
-            int awayGoals = data.getInt(3);
-            data.close();
+            for (int appWidgetId : appWidgetIds) {
+                RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.widget_scores);
 
-            Intent broadcastIntent = new Intent();
-            broadcastIntent.setAction(TodayWidgetProvider.DATABASE_CHANGED);
-            broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-            broadcastIntent.putExtra(TodayWidgetProvider.HOME_COL_KEY, homeTeam);
-            broadcastIntent.putExtra(TodayWidgetProvider.AWAY_COL_KEY, awayTeam);
-            broadcastIntent.putExtra(TodayWidgetProvider.HOME_GOALS_KEY, homeGoals);
-            broadcastIntent.putExtra(TodayWidgetProvider.AWAY_GOALS_KEY, awayGoals);
-            sendBroadcast(broadcastIntent);
+                String homeTeam = data.getString(0);
+                String awayTeam = data.getString(1);
+                int homeGoals = data.getInt(2);
+                int awayGoals = data.getInt(3);
+
+                remoteViews.setViewVisibility(R.id.widget_home_name, View.VISIBLE);
+                remoteViews.setViewVisibility(R.id.widget_away_name, View.VISIBLE);
+                remoteViews.setViewVisibility(R.id.widget_score_textview, View.VISIBLE);
+                remoteViews.setViewVisibility(R.id.widget_no_matches, View.GONE);
+
+                remoteViews.setTextViewText(R.id.widget_home_name, homeTeam);
+                remoteViews.setTextViewText(R.id.widget_away_name, awayTeam);
+                remoteViews.setTextViewText(R.id.widget_score_textview, Utilies.getScores(homeGoals, awayGoals));
+
+                data.close();
+
+                //Fires the app from the widget
+                Intent configIntent = new Intent(getApplicationContext(), MainActivity.class);
+                PendingIntent configPendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, configIntent, 0);
+                remoteViews.setOnClickPendingIntent(R.id.widget, configPendingIntent);
+
+                appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+            }
         }
-//        if (!data.moveToFirst()) {
-//            data.close();
-//            return;
-//        }
-
-
     }
     private void processJSONdata (String JSONdata,Context mContext, boolean isReal)
     {
