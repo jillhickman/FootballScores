@@ -21,7 +21,7 @@
             android:id="@+id/widget_no_matches"
             android:text="@string/no_matches"
             android:gravity="center"
-            android:textColor="#000000"
+            android:textColor="@android:color/black"
             android:visibility="gone"
             />
 
@@ -30,7 +30,7 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:id="@+id/widget_home_name"
-            android:textColor="#000000"
+            android:textColor="@android:color/black"
             android:padding="10dp"
             tools:text="Home Team"/>
 
@@ -39,7 +39,7 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:textColor="#000000"
+            android:textColor="@android:color/black"
             android:gravity="center"
             android:id="@+id/widget_score_textview"
             android:textSize="@dimen/Score_widget"
@@ -48,7 +48,7 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:textColor="#000000"
+            android:textColor="@android:color/black"
             android:id="@+id/widget_away_name"
             android:padding="10dp"
             tools:text="Away Team"/>
