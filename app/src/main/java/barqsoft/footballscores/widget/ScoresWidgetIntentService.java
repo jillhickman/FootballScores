@@ -64,50 +64,5 @@ public class ScoresWidgetIntentService extends IntentService {
         mAwayGoals = data.getInt(INDEX_AWAY_GOALS);
         data.close();
 
-//        // Perform this loop procedure for each Today widget
-//        for (int appWidgetId : appWidgetIds) {
-//            int layoutId = R.layout.widget_scores;
-//            RemoteViews views = new RemoteViews(getPackageName(), layoutId);
-//
-//        //If we have data, set the views
-//        if (data != null && data.moveToFirst()) {
-//            views.setTextViewText(R.id.widget_home_name, data.getString(0));
-//            views.setTextViewText(R.id.widget_away_name, data.getString(1));
-//            views.setTextViewText(R.id.widget_score_textview, Utilies.getScores(data.getInt(2), data.getInt(3)));
-//
-//            //Set the no matches gone while the views visible
-//            views.setViewVisibility(R.id.widget_home_name, View.VISIBLE);
-//            views.setViewVisibility(R.id.widget_away_name, View.VISIBLE);
-//            views.setViewVisibility(R.id.widget_score_textview, View.VISIBLE);
-//            views.setViewVisibility(R.id.widget_no_matches, View.GONE);
-//        }else if(data.getCount() == 0){
-//            //Set the views gone while the no matches visible since there is no matches
-//            views.setViewVisibility(R.id.widget_home_name, View.GONE);
-//            views.setViewVisibility(R.id.widget_away_name, View.GONE);
-//            views.setViewVisibility(R.id.widget_score_textview, View.GONE);
-//            views.setViewVisibility(R.id.widget_no_matches, View.VISIBLE);
-//        }
-//
-//
-//            // Create an Intent to launch MainActivity
-//            Intent launchIntent = new Intent(this, MainActivity.class);
-//            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, launchIntent, 0);
-//            views.setOnClickPendingIntent(R.id.widget, pendingIntent);
-//
-//            appWidgetManager.updateAppWidget(appWidgetId, views);
-//
-//        }
-
-
     }
-//    //Update message from service
-//    public void onReceive(Context ctx, Intent intent) {
-//        final String action = intent.getAction();
-//        if (action.equals(SHOW_NEW_DATA_ACTION)) {
-//            final AppWidgetManager mgr = AppWidgetManager.getInstance(context);
-//            final ComponentName cn = new ComponentName(context, TodayWidgetProvider.class);
-//            mgr.notifyAppWidgetViewDataChanged(mgr.getAppWidgetIds(cn), R.id.widget_scores);
-//        }
-//        super.onReceive(ctx, intent);
-//    }
 }
